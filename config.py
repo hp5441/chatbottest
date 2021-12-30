@@ -7,4 +7,10 @@ class Settings(BaseSettings):
     token: str
 
     class Config:
-        env_file = ".env"
+        import os
+        is_prod = os.environ.get('IS_HEROKU', None)
+
+        if is_prod:
+            env_file = os.environ
+        else:
+            env_file = ".env"
