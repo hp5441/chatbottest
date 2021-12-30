@@ -15,7 +15,7 @@ def get_question(db: Session, question_id: int):
 
 def create_question(db: Session, question: schemas.QuestionCreate):
     
-    db_question = models.Question(question=question.question)
+    db_question = models.Question(**question.dict())
     db.add(db_question)
     db.commit()
     db.refresh(db_question)
