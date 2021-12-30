@@ -85,7 +85,7 @@ async def get_suggestions(q: schemas.QuestionBase, db: Session = Depends(get_db)
 
 
 @app.post("/getMatch", response_model=List[schemas.QuestionMatch])
-async def get_match(q: schemas.QuestionId, db: Session = Depends(get_db)):
+async def get_match(q: schemas.QuestionBase, db: Session = Depends(get_db)):
     from heapq import heappush, heappop
     q_nlp = nlp(q.question)
     max_similar_qs = []
