@@ -118,10 +118,14 @@ async def read_root():
 
 @app.post("/createQuestion", response_model=schemas.Question)
 async def create_question(question: schemas.QuestionCreate, db: Session = Depends(get_db), x_token: Optional[str] = Header(None)):
-    if x_token == token:
-        return crud.create_question(db, question)
-    else:
-        raise HTTPException(status_code=403, detail="Access denied")
+    try:
+        if x_token == token:
+            return crud.create_question(db, question)
+        else:
+            raise HTTPException(status_code=403, detail="Access denied")
+    finally:
+        global questions_list, nlp_dict
+        questions_list, nlp_dict = load_nlp_memory()
 
 
 @app.post("/createAnswer/{question_id}/", response_model=schemas.Answer)
@@ -130,7 +134,11 @@ async def create_answer(answer: schemas.AnswerCreate, question_id: int, db: Sess
     if not db_question:
         return HTTPException(status_code=404, detail="Question not found")
     else:
-        if x_token == token:
-            return crud.create_answer(db, answer, question_id)
-        else:
-            raise HTTPException(status_code=403, detail="Access denied")
+        try:
+            if x_token == token:
+                return crud.create_answer(db, answer, question_id)
+            else:
+                raise HTTPException(status_code=403, detail="Access denied")
+        finally:
+            global questions_list, nlp_dict
+            questions_list, nlp_dict = load_nlp_memory()
