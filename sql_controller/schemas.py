@@ -21,7 +21,6 @@ class Answer(AnswerBase):
 
 class QuestionBase(BaseModel):
     question: str
-    popularity: int
 
 
 class QuestionId(BaseModel):
@@ -29,10 +28,10 @@ class QuestionId(BaseModel):
 
 
 class QuestionCreate(QuestionBase):
-    pass
+    popularity: int
 
 
-class Question(QuestionBase):
+class Question(QuestionCreate):
     id: int
     is_active: bool
     answers: List[Answer] = []
