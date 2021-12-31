@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     app_name: str = "default"
     admin_email: str
     token: str
+    database_url: str
 
     class Config:
         import os
