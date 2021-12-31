@@ -7,7 +7,7 @@ from config import Settings
 # SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 settings = Settings()
 
-SQLALCHEMY_DATABASE_URL = settings.database_url + ":5432/db"
+SQLALCHEMY_DATABASE_URL = settings.database_url
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
