@@ -123,6 +123,8 @@ async def create_question(question: schemas.QuestionCreate, db: Session = Depend
             return crud.create_question(db, question)
         else:
             raise HTTPException(status_code=403, detail="Access denied")
+    except Exception as e:
+        raise HTTPException(status_code=422, detail="Error while creating entry")
     finally:
         global questions_list, nlp_dict
         questions_list, nlp_dict = load_nlp_memory()
@@ -139,6 +141,8 @@ async def create_answer(answer: schemas.AnswerCreate, question_id: int, db: Sess
                 return crud.create_answer(db, answer, question_id)
             else:
                 raise HTTPException(status_code=403, detail="Access denied")
+        except Exception as e:
+            raise HTTPException(status_code=422, detail="Error while creating entry")
         finally:
             global questions_list, nlp_dict
             questions_list, nlp_dict = load_nlp_memory()
