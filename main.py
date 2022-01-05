@@ -2,6 +2,7 @@ from typing import List, Optional
 import spacy
 
 from fastapi import Depends, FastAPI, HTTPException, Header
+from fastapi.middleware.cors import CORSMiddleware
 
 from sqlalchemy.orm import Session
 from sql_controller import crud, models, schemas
@@ -12,6 +13,24 @@ from config import Settings
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:8080",
+    "https://hcisingapore.gov.in"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 nlp = spacy.load("en_core_web_md")
 print("new")
 
