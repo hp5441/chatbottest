@@ -165,3 +165,21 @@ async def create_answer(answer: schemas.AnswerCreate, question_id: int, db: Sess
         finally:
             global questions_list, nlp_dict
             questions_list, nlp_dict = load_nlp_memory()
+            
+            
+@app.post("/deleteAnswer/{answer_id}/")
+async def delete_answer(answer_id: int, db: Session = Depends(get_db), x_token: Optional[str] = Header(None)):
+    db_answer = crud.get_answer(db, answer_id)
+    if not db_answer:
+        return HTTPException(status_code=404, detail="Question not found")
+    else:
+        try:
+            if x_token == token:
+                return crud.delete_answer(db, answer_id)
+            else:
+                raise HTTPException(status_code=403, detail="Access denied")
+        except Exception as e:
+            raise HTTPException(status_code=422, detail="Error while creating entry")
+        finally:
+            global questions_list, nlp_dict
+            questions_list, nlp_dict = load_nlp_memory()
