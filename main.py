@@ -1,5 +1,7 @@
+import json
 from typing import List, Optional
 import spacy
+from bleach import linkify
 
 from fastapi import Depends, FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,6 +10,8 @@ from sqlalchemy.orm import Session
 from sql_controller import crud, models, schemas
 from sql_controller.database import SessionLocal, engine
 from config import Settings
+
+from utils import KMPSearch, computeLPSArray
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -60,6 +64,24 @@ def process_text(text):
     return " ".join(result)
 
 
+def process_question(question: models.Question, match=""):
+    processed_question = question.question
+    if len(match):
+        pattern_index = KMPSearch(match.lower(), processed_question.lower())
+        if pattern_index is not None:
+            processed_question = processed_question[:pattern_index]+"_"+match+"_"+processed_question[pattern_index+len(match):]
+    question.question =  json.dumps("<p>"+processed_question+"</p>")
+    return question
+
+
+def process_answer(answer : models.Answer):
+    processed_answer = json.loads(answer.answer).strip()
+    html = "<p>"+linkify(processed_answer)+"</p>"
+    answer.answer = json.dumps(html)
+    return answer
+    
+
+
 def load_nlp_memory():
     try:
         db = SessionLocal()
@@ -93,6 +115,7 @@ async def get_all_questions(db: Session = Depends(get_db), x_token: Optional[str
 async def get_suggestions(q: schemas.QuestionBase, db: Session = Depends(get_db)):
     suggested_list = []
     q_ind = 0
+    q.question = q.question.strip()
     global questions_list, nlp_dict
     
     if len(questions_list)==0:
@@ -100,8 +123,11 @@ async def get_suggestions(q: schemas.QuestionBase, db: Session = Depends(get_db)
 
     while len(q.question)>=3 and q_ind < len(questions_list) and len(suggested_list) < 5:
         if q.question.lower() in questions_list[q_ind].question.lower():
-            suggested_list.append(crud.get_question(
-                db, questions_list[q_ind].id))
+            fetched_question = crud.get_question(
+                db, questions_list[q_ind].id)
+            fetched_question = process_question(fetched_question)
+            fetched_question.answers = [process_answer(answer) for answer in fetched_question.answers] 
+            suggested_list.append(fetched_question)
         q_ind += 1
 
     return suggested_list
@@ -121,6 +147,8 @@ async def get_match(q: schemas.QuestionBase, db: Session = Depends(get_db)):
         score, question_id = heappop(max_similar_qs)
         db_question = crud.get_question(db, question_id)
         if db_question:
+            db_question = process_question(db_question)
+            db_question.answers = [process_answer(answer) for answer in db_question.answers]
             top_five.append({"similarity": -1*score, **
                             schemas.Question.from_orm(db_question).dict()})
     return top_five
@@ -131,6 +159,9 @@ async def get_ans(question_id: schemas.QuestionId, db: Session = Depends(get_db)
     db_question = crud.get_question(db, question_id.id)
     if not db_question:
         raise HTTPException(status_code=404, detail="Question not found")
+    
+    db_question = process_question(db_question)
+    db_question.answers = [process_answer(answer) for answer in db_question.answers]
     return db_question
 
 
