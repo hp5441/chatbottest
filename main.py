@@ -93,6 +93,10 @@ async def get_all_questions(db: Session = Depends(get_db), x_token: Optional[str
 async def get_suggestions(q: schemas.QuestionBase, db: Session = Depends(get_db)):
     suggested_list = []
     q_ind = 0
+    global questions_list, nlp_dict
+    
+    if len(questions_list)==0:
+        questions_list, nlp_dict = load_nlp_memory()
 
     while q_ind < len(questions_list) and len(suggested_list) < 5:
         if q.question in questions_list[q_ind].question:
