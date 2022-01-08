@@ -39,6 +39,7 @@ spacy-loggers==1.0.1
 SQLAlchemy==1.4.29
 srsly==2.4.2
 starlette==0.16.0
+textile==4.0.2
 thinc==8.0.13
 tqdm==4.62.3
 typer==0.4.0
