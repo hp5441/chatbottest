@@ -2,6 +2,7 @@ import json
 from typing import List, Optional
 import spacy
 from bleach import linkify
+from textile import textile
 
 from fastapi import Depends, FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -69,8 +70,9 @@ def process_question(question: models.Question, match=""):
     if len(match):
         pattern_index = KMPSearch(match.lower(), processed_question.lower())
         if pattern_index is not None:
-            processed_question = processed_question[:pattern_index]+"_"+match+"_"+processed_question[pattern_index+len(match):]
-    question.question =  json.dumps("<p>"+processed_question+"</p>")
+            processed_question = processed_question[:pattern_index]+"_"+processed_question[pattern_index:pattern_index+len(match)]+"_"+processed_question[pattern_index+len(match):]
+            print(processed_question)
+    question.question = textile(processed_question, html_type="html5")
     return question
 
 
@@ -125,7 +127,7 @@ async def get_suggestions(q: schemas.QuestionBase, db: Session = Depends(get_db)
         if q.question.lower() in questions_list[q_ind].question.lower():
             fetched_question = crud.get_question(
                 db, questions_list[q_ind].id)
-            fetched_question = process_question(fetched_question)
+            fetched_question = process_question(fetched_question, q.question)
             fetched_question.answers = [process_answer(answer) for answer in fetched_question.answers] 
             suggested_list.append(fetched_question)
         q_ind += 1
