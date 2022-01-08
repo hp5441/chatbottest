@@ -70,7 +70,7 @@ def process_question(question: models.Question, match=""):
     if len(match):
         pattern_index = KMPSearch(match.lower(), processed_question.lower())
         if pattern_index is not None:
-            processed_question = processed_question[:pattern_index]+"_"+processed_question[pattern_index:pattern_index+len(match)]+"_"+processed_question[pattern_index+len(match):]
+            processed_question = processed_question[:pattern_index]+"<em>"+processed_question[pattern_index:pattern_index+len(match)]+"</em>"+processed_question[pattern_index+len(match):]
             print(processed_question)
     question.question = textile(processed_question, html_type="html5")
     return question
