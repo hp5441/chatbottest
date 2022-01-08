@@ -98,8 +98,8 @@ async def get_suggestions(q: schemas.QuestionBase, db: Session = Depends(get_db)
     if len(questions_list)==0:
         questions_list, nlp_dict = load_nlp_memory()
 
-    while q_ind < len(questions_list) and len(suggested_list) < 5:
-        if q.question in questions_list[q_ind].question:
+    while len(q.question)>=3 and q_ind < len(questions_list) and len(suggested_list) < 5:
+        if q.question.lower() in questions_list[q_ind].question.lower():
             suggested_list.append(crud.get_question(
                 db, questions_list[q_ind].id))
         q_ind += 1
