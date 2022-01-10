@@ -42,3 +42,7 @@ class Question(QuestionCreate):
 
 class QuestionMatch(Question):
     similarity: float
+    
+class QuestionsMatch(BaseModel):
+    relevant: List[QuestionMatch] = []
+    others: List[QuestionMatch] = []

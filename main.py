@@ -135,7 +135,7 @@ async def get_suggestions(q: schemas.QuestionBase, db: Session = Depends(get_db)
     return suggested_list
 
 
-@app.post("/getMatch", response_model=List[schemas.QuestionMatch])
+@app.post("/getMatch", response_model=schemas.QuestionsMatch)
 async def get_match(q: schemas.QuestionBase, db: Session = Depends(get_db)):
     from heapq import heappush, heappop
     q_nlp = nlp(process_text(q.question))
@@ -144,16 +144,22 @@ async def get_match(q: schemas.QuestionBase, db: Session = Depends(get_db)):
     for key, value in nlp_dict.items():
         heappush(max_similar_qs, (-1*q_nlp.similarity(value), key))
 
-    top_five = []
-    while len(max_similar_qs) > 0 and len(top_five) < 5:
+    relevant=[]
+    others=[]
+    
+    while len(max_similar_qs) > 0 and (len(relevant)+len(others))< 5:
         score, question_id = heappop(max_similar_qs)
         db_question = crud.get_question(db, question_id)
         if db_question:
             db_question = process_question(db_question)
             db_question.answers = [process_answer(answer) for answer in db_question.answers]
-            top_five.append({"similarity": -1*score, **
-                            schemas.Question.from_orm(db_question).dict()})
-    return top_five
+            if (-1*score)>=0.75:
+                relevant.append({"similarity": -1*score, **
+                                schemas.Question.from_orm(db_question).dict()})
+            else:
+                others.append({"similarity": -1*score, **
+                                schemas.Question.from_orm(db_question).dict()})
+    return {'relevant':relevant, 'others':others}
 
 
 @app.post("/getQuestionAns", response_model=schemas.Question)
