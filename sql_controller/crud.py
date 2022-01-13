@@ -32,7 +32,7 @@ def get_answer(db: Session, answer_id:int):
 
 
 def create_answer(db: Session, answer: schemas.AnswerCreate, question_id: int):
-    db_answer = models.Answer(answer=json.dumps(answer.answer), question_id=question_id)
+    db_answer = models.Answer(answer=json.dumps(answer.answer, strict=False), question_id=question_id)
     db.add(db_answer)
     db.commit()
     db.refresh(db_answer)
