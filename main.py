@@ -1,4 +1,5 @@
 import json
+from html import escape
 from typing import List, Optional
 import spacy
 from bleach import linkify
@@ -77,12 +78,13 @@ def process_question(question: models.Question, match=""):
 
 
 def process_answer(answer : models.Answer):
-    processed_answer = answer.answer
+    processed_answer = json.loads(answer.answer)
     if processed_answer[0]!="<" and processed_answer[-1]!=">":
         html = linkify("<p>"+processed_answer+"</p>")
     else:
         html=linkify(processed_answer)
-    answer.answer = html
+        
+    answer.answer = json.dumps(html, default=str)
     return answer
     
 
