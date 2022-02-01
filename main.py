@@ -82,7 +82,7 @@ def process_answer(answer : models.Answer):
         html = linkify("<p>"+processed_answer+"</p>")
     else:
         html=linkify(processed_answer)
-    answer.answer = html
+    answer.answer = json.dumps(html)
     return answer
     
 
