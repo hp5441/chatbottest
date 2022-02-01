@@ -81,7 +81,7 @@ def process_answer(answer : models.Answer):
     if processed_answer[0]!="<" and processed_answer[-1]!=">":
         html = linkify(processed_answer)
     else:
-        html=processed_answer
+        html=linkify(processed_answer)
     answer.answer = html
     return answer
     
