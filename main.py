@@ -1,3 +1,4 @@
+import html
 import json
 from typing import List, Optional
 import spacy
@@ -79,10 +80,10 @@ def process_question(question: models.Question, match=""):
 def process_answer(answer : models.Answer):
     processed_answer = json.loads(answer.answer).strip()
     if processed_answer[0]!="<" and processed_answer[-1]!=">":
-        html = linkify("<p>"+processed_answer+"</p>")
+        html_text = linkify("<p>"+processed_answer+"</p>")
     else:
-        html=linkify(processed_answer)
-    answer.answer = json.dumps(html)
+        html_text=linkify(processed_answer)
+    answer.answer = html.escape(html_text) 
     return answer
     
 
