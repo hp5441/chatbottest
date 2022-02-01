@@ -1,8 +1,10 @@
 import json
+from html import escape
 from typing import List, Optional
 import spacy
 from bleach import linkify
 from textile import textile
+import xmltojson
 
 from fastapi import Depends, FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -82,7 +84,7 @@ def process_answer(answer : models.Answer):
         html = linkify("<p>"+processed_answer+"</p>")
     else:
         html=linkify(processed_answer)
-    answer.answer = json.dumps(html)
+    answer.answer = xmltojson.parse(html)
     return answer
     
 
