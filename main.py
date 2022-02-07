@@ -94,7 +94,7 @@ def process_answer(answer : models.Answer):
 def load_nlp_memory():
     try:
         db = SessionLocal()
-        questions_list = crud.get_questions(db)
+        questions_list = sorted(crud.get_questions(db), key=lambda x:x.is_keyword)
         nlp_dict = dict(
             map(lambda q: (q.id, nlp(process_text(q.question))), questions_list))
         return questions_list, nlp_dict
