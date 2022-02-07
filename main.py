@@ -83,7 +83,7 @@ def process_question(question: models.Question, match=""):
 def process_answer(answer : models.Answer):
     processed_answer = json.loads(answer.answer)
     if processed_answer[0]!="<" and processed_answer[-1]!=">":
-        html = linkify("<p>"+processed_answer+"</p>")
+        html = linkify("<p style='white-space: pre-line' >"+processed_answer+"</p>")
     else:
         html=processed_answer
     answer.answer = json.dumps(html, default=str)
