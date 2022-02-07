@@ -11,6 +11,7 @@ class Question(Base):
     question = Column(String, unique=True, index=True)
     popularity = Column(Integer)
     is_active = Column(Boolean, default=True)
+    is_keyword = Column(Boolean, default=False)
 
     answers = relationship("Answer", back_populates="question")
 
