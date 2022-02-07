@@ -29,6 +29,7 @@ class QuestionId(BaseModel):
 
 class QuestionCreate(QuestionBase):
     popularity: int
+    is_keyword: bool = False
 
 
 class Question(QuestionCreate):
