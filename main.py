@@ -160,7 +160,7 @@ async def get_match(q: schemas.QuestionBase, db: Session = Depends(get_db)):
         if db_question:
             db_question = process_question(db_question)
             db_question.answers = [process_answer(answer) for answer in db_question.answers]
-            if (-1*score)>=0.75:
+            if (-1*score)>=0.9:
                 relevant.append({"similarity": -1*score, **
                                 schemas.Question.from_orm(db_question).dict()})
             else:
