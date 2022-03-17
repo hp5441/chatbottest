@@ -3,10 +3,13 @@ import os
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import asyncio
+import requests
 
 
 
 def tick():
+    resp = requests.post("https://chatbotpytest.herokuapp.com/startSession").json()
+    print(resp)
     print('Tick! The time is: %s' % datetime.now())
 
 
