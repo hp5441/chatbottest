@@ -25,7 +25,8 @@ origins = [
     "https://localhost.tiangolo.com",
     "http://localhost",
     "http://localhost:8080",
-    "https://hcisingapore.gov.in"
+    "https://hcisingapore.gov.in",
+    "https://www.hcisingapore.gov.in"
 ]
 
 app.add_middleware(
