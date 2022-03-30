@@ -176,6 +176,7 @@ async def get_ans(question_id: schemas.QuestionId, db: Session = Depends(get_db)
     if not db_question:
         raise HTTPException(status_code=404, detail="Question not found")
     
+    crud.increment_popularity(db, question_id.id)
     db_question = process_question(db_question)
     db_question.answers = [process_answer(answer) for answer in db_question.answers]
     return db_question

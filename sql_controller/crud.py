@@ -1,6 +1,7 @@
 from pydantic.types import Json
 import json
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 
 from . import models, schemas
 
@@ -9,7 +10,7 @@ def get_questions(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Question).offset(skip).all()
 
 def get_top_questions(db: Session, limit: int = 5):
-    return db.query(models.Question).order_by(models.Question.popularity).limit(limit).all()
+    return db.query(models.Question).order_by(desc(models.Question.popularity)).limit(limit).all()
 
 def get_question(db: Session, question_id: int):
     return db.query(models.Question).filter(models.Question.id==question_id).first()
@@ -54,3 +55,10 @@ def delete_answer(db: Session, answer_id: int):
     db_answer = db.query(models.Answer).filter(models.Answer.id==answer_id).delete(synchronize_session=False)
     db.commit()
     return db_answer
+
+
+def increment_popularity(db: Session, question_id: int):
+    q_list = db.query(models.Question).filter(models.Question.id==question_id).all()
+    for q in q_list:
+        q.popularity+=1
+    db.commit()
